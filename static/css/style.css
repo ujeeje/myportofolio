@@ -64,6 +64,55 @@ h1, .brand {
     font-size: 0.95rem;
 }
 
+.nav-toggle, .hamburger {
+    display: none;
+}
+
+.hamburger {
+    cursor: pointer;
+    width: 28px;
+    height: 20px;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.hamburger span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background-color: var(--ink);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+
+    .site-header nav {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: var(--paper);
+        border-bottom: 1px solid var(--line);
+        padding: 1.5rem;
+        gap: 1.25rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-toggle:checked ~ nav {
+        display: flex;
+    }
+
+    .nav-toggle {
+        display: none;
+    }
+}
+
 /* Pengaturan Dasar Section */
 .page-section {
     padding: 5rem 0;
