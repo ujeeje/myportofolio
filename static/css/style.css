@@ -37,6 +37,7 @@ h1, .brand {
 
 .site-header {
     border-bottom: 1px solid var(--line);
+    position: relative;
 }
 
 .site-header .container {
@@ -97,6 +98,7 @@ h1, .brand {
         top: 100%;
         left: 0;
         width: 100%;
+        z-index: 1000;
         background-color: var(--paper);
         border-bottom: 1px solid var(--line);
         padding: 1.5rem;
