@@ -64,6 +64,20 @@ h1, .brand {
     font-size: 0.95rem;
 }
 
+/* Pengaturan Dasar Section */
+.page-section {
+    padding: 5rem 0;
+    background-color: #f9fafb; 
+    overflow-x: hidden;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    color: #d95d39;
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
 /* Hero */
 .hero {
     padding: 4.5rem 0 5rem;
@@ -174,12 +188,218 @@ h1, .brand {
     border: 3px solid var(--ink);
 }
 
-/* Footer & Responsive */
-.site-footer {
+/* Achivement */
+.achievements {
+    padding: 5rem 0;
+    background-color: var(--paper);
+    overflow: hidden;
+}
+
+.achievements h2 {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-size: 2rem;
+    margin-bottom: 3rem;
+    color: var(--ink);
+    text-align: center;
+}
+
+.marquee-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.marquee-track {
+    display: flex;
+    gap: 2rem;
+    width: max-content; 
+    animation: scroll-left 40s linear infinite;
+}
+
+.marquee-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+    flex-shrink: 0;
+    background-color: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.marquee-item img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+}
+
+.marquee-item p {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: center;
+}
+
+@keyframes scroll-left {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Experience */
+.timeline {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.timeline::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    background-color: #e5e7eb;
+}
+.experience-item {
+    position: relative;
+    display: flex;
+    gap: 1.25rem;
+    background-color: #faeeeb;
     padding: 1.5rem;
-    color: var(--text-muted);
+    border-radius: 8px;
+    border: 1px solid #ffd3c7;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    
+    width: calc(50% - 2.5rem); 
+    margin-bottom: 2rem;
+}
+
+.experience-item:last-child {
+    margin-bottom: 0;
+}
+
+.experience-item:nth-child(odd) {
+    margin-left: 0;
+}
+
+.experience-item:nth-child(even) {
+    margin-left: auto; 
+}
+
+.experience-item::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: #0a66c2;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #e5e7eb; 
+    top: 1.5rem;
+}
+
+.experience-item:nth-child(odd)::before {
+    right: calc(-2.5rem - 8px); 
+}
+
+.experience-item:nth-child(even)::before {
+    left: calc(-2.5rem - 8px);
+}
+
+.experience-logo {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.experience-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.experience-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #0a66c2;
+    margin-bottom: 0.2rem;
+    line-height: 1.4;
+}
+
+.experience-org {
+    font-size: 0.95rem;
+    color: #181818;
+    margin-bottom: 0.25rem;
+}
+
+.experience-date {
     font-size: 0.85rem;
-    border-top: 1px solid var(--line);
+    color: #666666;
+}
+
+/* Responsivitas (Kembali ke 1 sisi pada layar HP) */
+@media (max-width: 768px) {
+    .timeline::before {
+        left: 0;
+    }
+    
+    .experience-item {
+        width: calc(100% - 2rem);
+        margin-left: 2rem !important;
+    }
+    
+    .experience-item:nth-child(odd)::before,
+    .experience-item:nth-child(even)::before {
+        left: calc(-2rem - 8px);
+        right: auto;
+    }
+}
+
+/* Skills */
+.skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.skill-box {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #374151;
+    background-color: #faeeeb;
+    border: 1px solid #ffd3c7;
+    border-radius: 6px; 
+    white-space: nowrap; 
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+.skill-box:hover {
+    background-color: #faeeeb;
+    border-color: #ffd3c7;
+    color: #111827;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 600px) {
