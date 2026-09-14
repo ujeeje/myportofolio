@@ -1,13 +1,14 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experience - {{ name }}</title>
+    <title>CTF Blog - {{ name }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     <header class="site-header">
@@ -28,31 +29,31 @@
     </header>
 
     <main>
-        <section class="experience-section" id="experience">
+        <section class="ctf-section" id="ctf-blog">
             <div class="container">
-                <p class="section-kicker">My experience so far</p>
-                <h1>Experience</h1>
+                <p class="section-kicker">My CTF Journey</p>
+                <h1>CTF Writeups</h1>
 
-                <div class="experience-grid">
-                    {% for experience in experience_list %}
-                        <article class="experience-card">
-                            <span class="experience-category">
-                                {{ experience.get_category_display }}
-                            </span>
-                            <h2>{{ experience.title }}</h2>
-                            <p class="experience-description">
-                                {{ experience.description }}
-                            </p>
+                <div class="ctf-grid">
+                    {% for writeup in writeups %}
+                        <article class="ctf-card">
+                            <h2>{{ writeup.title }}</h2>
 
-                            {% if experience.is_ongoing %}
-                                <p class="experience-status">On-going</p>
-                            {% else %}
-                                <p class="experience-status">Done</p>
-                            {% endif %}
+                            <div class="ctf-content">
+                                {% if writeup.description %}
+                                    <p>{{ writeup.description }}</p>
+                                {% endif %}
+
+                                {% if writeup.pdf_filename %}
+                                    <a href="{% static 'pdf/' %}{{ writeup.pdf_filename }}" target="_blank" class="btn-read-pdf">Buka Dokumen PDF</a>
+                                {% else %}
+                                    <p style="color: red;">Berkas PDF belum tersedia.</p>
+                                {% endif %}
+                            </div>
                         </article>
                     {% empty %}
                         <p class="empty-state">
-                            No experience added
+                            Belum ada CTF writeup yang dipublikasikan saat ini.
                         </p>
                     {% endfor %}
                 </div>

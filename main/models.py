@@ -18,9 +18,19 @@ class Experience(models.Model):
     thumbnail = models.URLField(blank=True, null=True)
     started_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(blank=True, null=True)
+
     def __str__(self):
         return self.title
     
     @property
     def is_ongoing(self):
         return self.ended_at is None
+
+class CTFWriteup(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True) 
+    pdf_filename = models.CharField(max_length=255) 
+
+    def __str__(self):
+        return self.title

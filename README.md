@@ -16,3 +16,5 @@ Untuk bagian CSS, saya menggunakan AI untuk membantu menuangkan gaya design saya
 3. Batasan utama yang saya rasakan saat menggunakan web statis murni adalah kesulitan dalam menggabungkan animasi slide otomatis pada bagian achievement agar tetap bisa digeser atau di-swipe secara manual secara bersamaan. Berdasarkan batasan tersebut, fungsionalitas dinamis yang paling ingin saya persiapkan pada iterasi proyek selanjutnya adalah membuat setiap item seperti achievement, experience, atau skills dapat diklik untuk membuka tampilan modal atau halaman detail yang lebih luas dan mendetail mengenai item tersebut.
 
 Riwayat penggunaan generative AI: https://share.gemini.google/exYx9S0VjfGT
+
+## Tugas 2
