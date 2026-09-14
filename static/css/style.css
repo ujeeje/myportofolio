@@ -524,3 +524,81 @@ h1, .brand {
     font-size: 0.85rem;
     font-weight: 600;
 }
+
+/* Kontainer Utama Section */
+.ctf-section {
+    padding: 4rem 0;
+    border-top: 1px solid var(--line);
+}
+
+/* Kicker (Sudah digunakan bersama jika diletakkan di style.css global) */
+.section-kicker {
+    color: var(--accent-dark);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Judul Utama */
+.ctf-section h1 {
+    margin: 0.4rem 0 1.5rem;
+    font-size: 2rem;
+}
+
+/* Tata Letak Grid */
+.ctf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+/* Komponen Kartu */
+.ctf-card {
+    padding: 1.25rem;
+    background-color: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+/* Metadata (Tanggal Publikasi) mirip dengan experience-category */
+.ctf-meta,
+.ctf-date {
+    color: var(--accent-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: block;
+}
+
+/* Judul di dalam Kartu */
+.ctf-card h2 {
+    margin: 0.5rem 0;
+    font-size: 1.25rem;
+}
+
+/* Teks Deskripsi dan Empty State */
+.ctf-content p,
+.empty-state {
+    color: var(--text-muted);
+}
+
+/* Gaya Khusus untuk Tombol PDF */
+.btn-read-pdf {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-read-pdf:hover {
+    background-color: #ececec;
+    color: var(--accent-dark);
+}
