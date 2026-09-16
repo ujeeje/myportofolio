@@ -571,19 +571,16 @@ h1, .brand {
     display: block;
 }
 
-/* Judul di dalam Kartu */
 .ctf-card h2 {
     margin: 0.5rem 0;
     font-size: 1.25rem;
 }
 
-/* Teks Deskripsi dan Empty State */
 .ctf-content p,
 .empty-state {
     color: var(--text-muted);
 }
 
-/* Gaya Khusus untuk Tombol PDF */
 .btn-read-pdf {
     display: inline-block;
     margin-top: 1rem;
@@ -601,4 +598,63 @@ h1, .brand {
 .btn-read-pdf:hover {
     background-color: #ececec;
     color: var(--accent-dark);
+}
+
+.writeup-form {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.7rem;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    font: inherit;
+    transition:
+        border-color 0.2s ease,
+        outline-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: 2px solid var(--accent);
+    border-color: var(--accent);
+}
+
+.form-error {
+    color: #b42318;
+    font-size: 0.85rem;
+    margin-top: 0.35rem;
+}
+
+.button {
+    display: inline-block;
+    height: fit-content;
+    border: 0;
+    border-radius: var(--radius);
+    padding: 0.65rem 1rem;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.button-secondary {
+    background: var(--ink);
 }

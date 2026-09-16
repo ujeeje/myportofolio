@@ -128,6 +128,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CSRF_TRUSTED_ORIGINS = ["https://jefry-acmal-myportofolio.pws.cs.ui.ac.id"]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
