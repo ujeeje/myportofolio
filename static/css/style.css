@@ -531,7 +531,6 @@ h1, .brand {
     border-top: 1px solid var(--line);
 }
 
-/* Kicker (Sudah digunakan bersama jika diletakkan di style.css global) */
 .section-kicker {
     color: var(--accent-dark);
     font-size: 0.8rem;
@@ -540,28 +539,29 @@ h1, .brand {
     text-transform: uppercase;
 }
 
-/* Judul Utama */
 .ctf-section h1 {
     margin: 0.4rem 0 1.5rem;
     font-size: 2rem;
 }
 
-/* Tata Letak Grid */
 .ctf-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 0.5rem;
 }
 
-/* Komponen Kartu */
 .ctf-card {
+    display: flex;
+    flex-direction: column;
     padding: 1.25rem;
     background-color: #fff;
     border: 1px solid var(--line);
     border-radius: var(--radius);
 }
 
-/* Metadata (Tanggal Publikasi) mirip dengan experience-category */
 .ctf-meta,
 .ctf-date {
     color: var(--accent-dark);
@@ -581,9 +581,32 @@ h1, .brand {
     color: var(--text-muted);
 }
 
+.ctf-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.ctf-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.ctf-actions .button,
+.ctf-actions .btn-read-pdf {
+    min-height: 2.75rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+}
+
 .btn-read-pdf {
-    display: inline-block;
-    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.5rem 1rem;
     background-color: #f9f9f9;
     color: #333;
@@ -598,6 +621,49 @@ h1, .brand {
 .btn-read-pdf:hover {
     background-color: #ececec;
     color: var(--accent-dark);
+}
+
+.project-search {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 1rem 0 1.5rem;
+}
+
+.project-search__input {
+    width: 100%;
+    min-width: 0;
+    height: 3rem;
+    padding: 0 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+}
+
+.project-search__input:focus {
+    outline: 2px solid var(--accent);
+    border-color: var(--accent);
+}
+
+.project-search .button {
+    width: auto;
+    height: 3rem;
+    min-height: 3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1.25rem;
+    line-height: 1;
+}
+
+.ctf-content form {
+    margin: 0;
 }
 
 .writeup-form {
@@ -657,4 +723,57 @@ h1, .brand {
 
 .button-secondary {
     background: var(--ink);
+}
+
+@media (max-width: 600px) {
+    .project-search {
+        flex-direction: column;
+    }
+
+    .project-search .button {
+        width: 100%;
+    }
+
+    .experience-list {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+.experience-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-height: 70vh;
+    margin-top: 1.5rem;
+    margin-left: 0;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.experience-list .experience-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.experience-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.experience-actions form {
+    margin: 0;
+}
+
+.experience-actions .button,
+.experience-actions .btn-read-pdf {
+    min-height: 2.75rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
 }

@@ -1,13 +1,24 @@
 {% extends 'base.html' %}
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
 {% block content %}
     <main>
         <section class="ctf-section" id="ctf-blog">
             <div class="container">
                 <p class="section-kicker">My CTF Journey</p>
                 <h1>CTF Writeups</h1>
+
+                <a href="{% url 'main:create_writeup' %}" class="button">Tambah Write-Up</a>
+
+                <form method="get" action="{% url 'main:show_ctf_blog' %}" class="project-search">
+                    <input
+                        type="search"
+                        name="title"
+                        value="{{ title_query }}"
+                        placeholder="Cari berdasarkan nama write-up"
+                        class="project-search__input"
+                        aria-label="Cari berdasarkan nama write-up">
+                    <button type="submit" class="button">Search</button>
+                </form>
+
 
                 <div class="ctf-grid">
                     {% for writeup in writeups %}
@@ -19,11 +30,18 @@
                                     <p>{{ writeup.description }}</p>
                                 {% endif %}
 
-                                {% if writeup.pdf_filename %}
-                                    <a href="{% static 'pdf/' %}{{ writeup.pdf_filename }}" target="_blank" class="btn-read-pdf">Buka Dokumen PDF</a>
-                                {% else %}
-                                    <p style="color: red;">Berkas PDF belum tersedia.</p>
-                                {% endif %}
+                                <div class="ctf-actions">
+                                    {% if writeup.writeup_url %}
+                                        <a href="{{ writeup.writeup_url }}" target="_blank" class="btn-read-pdf">Open</a>
+                                    {% else %}
+                                        <p style="color: red;">Link write-up belum tersedia.</p>
+                                    {% endif %}
+
+                                    <form method="post" action="{% url 'main:delete_writeup' writeup.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="button button-secondary">Delete</button>
+                                    </form>
+                                </div>
                             </div>
                         </article>
                     {% empty %}
