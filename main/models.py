@@ -29,8 +29,7 @@ class Experience(models.Model):
 class CTFWriteup(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True) 
-    pdf_filename = models.CharField(max_length=255) 
+    description = models.TextField(null=True, blank=True)
     writeup_url = models.URLField(max_length=200, blank=True, null=True)
 
     def __str__(self):

@@ -31,12 +31,20 @@ def show_experience(request):
     return render(request, "experience.html", context)
 
 def show_ctf_blog(request):
-    writeups = CTFWriteup.objects.all()
+    json_response = get_writeups_json(request)
+    writeups = serializers.deserialize(
+        "json",
+        json_response.content.decode("utf-8"),
+    )
+    writeups = [writeup.object for writeup in writeups]
+    title_query = request.GET.get("title", "").strip()
+
     context = {
         "name": "Jefry Acmal Dzikhrullah",
-        'writeups': writeups
+        "writeups": writeups,
+        "title_query": title_query,
     }
-    return render(request, 'ctf_blog.html', context)
+    return render(request, "ctf_blog.html", context)
 
 def create_writeup(request):
     form = CTFWriteupBlog(request.POST or None)
@@ -47,7 +55,26 @@ def create_writeup(request):
         return redirect("main:show_ctf_blog")
 
     context = {
-        "name": "Jefry",
+        "name": "Jefry Acmal Dzikhrullah",
         "form": form,
     }
     return render(request, "writeup_form.html", context)
+
+def get_writeups_json(request):
+    title_query = request.GET.get("title", "").strip()
+    writeups = CTFWriteup.objects.all()
+
+    if title_query:
+        writeups = writeups.filter(title__icontains=title_query)
+
+    writeups_json = serializers.serialize("json", writeups)
+    return HttpResponse(writeups_json, content_type="application/json")
+
+def delete_writeup(request, writeup_id):
+    writeup = get_object_or_404(CTFWriteup, pk=writeup_id)
+
+    if request.method == "POST":
+        writeup.delete()
+        messages.success(request, "Write-up berhasil dihapus!")
+
+    return redirect("main:show_ctf_blog")
