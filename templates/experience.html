@@ -29,14 +29,22 @@
                             {% endif %}
 
                             <div class="experience-actions">
-                                {% if user.is_superuser %}
-                                    <a href="{% url 'main:update_experience' experience.id %}" class="btn-read-pdf">Edit</a>
+                                {% if user.is_superuser or is_editor %}
+                                    <a href="{% url 'main:update_experience' experience.id %}"
+                                    class="btn-read-pdf">
+                                        Edit
+                                    </a>
+                                {% endif %}
 
-                                    <form method="post" action="{% url 'main:delete_experience' experience.id %}">
+                                {% if user.is_superuser %}
+                                    <form method="post"
+                                        action="{% url 'main:delete_experience' experience.id %}">
                                         {% csrf_token %}
-                                        <button type="submit" class="button button-secondary">Delete</button>
+                                        <button type="submit" class="button button-secondary">
+                                            Delete
+                                        </button>
                                     </form>
-                                {% endif %}  
+                                {% endif %}
                             </div>
                         </article>
                     {% empty %}

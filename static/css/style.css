@@ -791,6 +791,8 @@ h1, .brand {
 
 .button-star.is-starred {
     background: var(--accent);
+    background-color: #f5c542;
+    color: #222;
 }
 
 .star-count {
