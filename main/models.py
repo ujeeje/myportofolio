@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.contrib.auth.models import User
 
 class Experience(models.Model):
     EXPERIENCE_CHOICES = [
@@ -32,5 +33,9 @@ class CTFWriteup(models.Model):
     description = models.TextField(null=True, blank=True)
     writeup_url = models.URLField(max_length=200, blank=True, null=True)
 
+    starred_by = models.ManyToManyField(
+        User, related_name="starred_writeup", blank=True
+    )
+    
     def __str__(self):
         return self.title

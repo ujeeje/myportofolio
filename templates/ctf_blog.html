@@ -5,16 +5,16 @@
             <div class="container">
                 <p class="section-kicker">My CTF Journey</p>
                 <h1>CTF Writeups</h1>
-
-                <a href="{% url 'main:create_writeup' %}" class="button">Tambah Write-Up</a>
-
-                <form method="get" action="{% url 'main:show_ctf_blog' %}" class="project-search">
+                {% if user.is_superuser %}
+                    <a href="{% url 'main:create_writeup' %}" class="button">Tambah Write-Up</a>
+                {% endif %}  
+                <form method="get" action="{% url 'main:show_ctf_blog' %}" class="writeup-search">
                     <input
                         type="search"
                         name="title"
                         value="{{ title_query }}"
                         placeholder="Cari berdasarkan nama write-up"
-                        class="project-search__input"
+                        class="writeup-search__input"
                         aria-label="Cari berdasarkan nama write-up">
                     <button type="submit" class="button">Search</button>
                 </form>
@@ -36,11 +36,13 @@
                                     {% else %}
                                         <p style="color: red;">Link write-up belum tersedia.</p>
                                     {% endif %}
-
-                                    <form method="post" action="{% url 'main:delete_writeup' writeup.id %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="button button-secondary">Delete</button>
-                                    </form>
+                                    {% include "components/writeup_star.html" with writeup=writeup %}
+                                    {% if user.is_superuser %}
+                                        <form method="post" action="{% url 'main:delete_writeup' writeup.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="button button-secondary">Delete</button>
+                                        </form>
+                                    {% endif %}
                                 </div>
                             </div>
                         </article>
