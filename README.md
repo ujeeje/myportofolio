@@ -49,6 +49,20 @@ Riwayat penggunaan generative AI: https://share.gemini.google/Mip5oJ1MldXQ
 
 https://chatgpt.com/s/cx_6ab155328e68819194a9d0aa63d669bb
 
+## Tugas 4
+
+### Perubahan Mingguan
+- Membuat otentifikasi register, login, dan logout
+- Menambahkan cookie `last_login` saat login pengguna dan menghapus cookie-nya saat logout
+- Membuat fitur interaktif bintang untuk writeup favorit pengguna
+- Otorisasi role guest yang hanya bisa melihat portofolio
+- Otorisasi role registered user yang bisa melihat portofolio dan memberi bintang
+- Otorisasi role editor yang bisa mengupdate data di section experience
+
+### Riwayat Penggunaan GenAI
+Pada tugas 4 ini saya menggunakan AI memeriksa otorisasi editor apakah sudah berjalan dengan benar, meminta penjelasan lebih lanjut pada aksi penambahan relasi ManyToManyField ke model User, serta memeriksa apakah perubahan yang dilakukan sudah memenuhi ketentuan dan website bisa berfungsi sebagaimana mestinya pada untuk semua fitur. Saya menyoroti AI masih belum bisa melakukan debugging web dengan baik terlebih direktori dan file yang diperlukan pada projek web portofolio ini yang semakin kompleks. Saya tetap melakukan debugging manual dengan juga berkonsultasi pada AI untuk menemukan solusinya.
+
+- https://chatgpt.com/s/cx_6aba872ac97c81919073e0d477152fc1
 
 ## Panduan Setup
 

@@ -18,6 +18,8 @@ import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied  
+from django.http import HttpResponseNotAllowed
+from django.http import JsonResponse
 
 
 def show_main(request):
@@ -44,27 +46,32 @@ def show_experience(request):
     experiences = [experience.object for experience in experiences]
     title_query = request.GET.get("title", "").strip()
 
+    is_editor = (
+        request.user.is_authenticated
+        and request.user.groups.filter(name="Editor").exists()
+    )
+
     context = {
         "name": "Jefry Acmal Dzikhrullah",
         "experience_list": experiences,
         "title_query": title_query,
+        "is_editor": is_editor,
     }
     return render(request, "experience.html", context)
 
 def show_ctf_blog(request):
-    json_response = get_writeups_json(request)
-    writeups = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    writeups = [writeup.object for writeup in writeups]
     title_query = request.GET.get("title", "").strip()
+    writeups = CTFWriteup.objects.all()
+
+    if title_query:
+        writeups = writeups.filter(title__icontains=title_query)
 
     context = {
         "name": "Jefry Acmal Dzikhrullah",
         "writeups": writeups,
         "title_query": title_query,
     }
+
     return render(request, "ctf_blog.html", context)
 
 def get_experiences_json(request):
@@ -74,7 +81,7 @@ def get_experiences_json(request):
     if title_query:
         experiences = experiences.filter(title__icontains=title_query)
 
-    experiences_json = serializers.serialize("json", experiences)
+    experiences_json = serializers.serialize("json", experiences, use_natural_foreign_keys=True)
     return HttpResponse(experiences_json, content_type="application/json")
 
 @login_required(login_url="/login/")
@@ -99,7 +106,9 @@ def create_experience(request):
 
 @login_required(login_url="/login/")
 def update_experience(request, experience_id):
-    if not request.user.is_superuser:
+    is_editor = request.user.groups.filter(name="Editor").exists()
+
+    if not request.user.is_superuser and not is_editor:
         raise PermissionDenied
     
     experience = get_object_or_404(Experience, pk=experience_id)
@@ -156,8 +165,14 @@ def get_writeups_json(request):
     if title_query:
         writeups = writeups.filter(title__icontains=title_query)
 
-    writeups_json = serializers.serialize("json", writeups)
-    return HttpResponse(writeups_json, content_type="application/json")
+    data = list(writeups.values(
+        "id",
+        "title",
+        "description",
+        "writeup_url",
+    ))
+
+    return JsonResponse(data, safe=False)
 
 @login_required(login_url="/login/")
 def delete_writeup(request, writeup_id):
@@ -210,12 +225,14 @@ def logout_user(request):
 
 @login_required(login_url="/login/")
 def toggle_star(request, writeup_id):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
     writeup = get_object_or_404(CTFWriteup, pk=writeup_id)
 
-    if request.method == "POST":
-        if request.user in writeup.starred_by.all():
-            writeup.starred_by.remove(request.user)
-        else:
-            writeup.starred_by.add(request.user)
+    if writeup.starred_by.filter(pk=request.user.pk).exists():
+        writeup.starred_by.remove(request.user)
+    else:
+        writeup.starred_by.add(request.user)
 
     return redirect("main:show_ctf_blog")
