@@ -53,22 +53,33 @@ def show_experience(request):
         and request.user.groups.filter(name="Editor").exists()
     )
 
+    is_editor = (
+        request.user.is_authenticated
+        and request.user.groups.filter(name="Editor").exists()
+    )
+
     context = {
         "name": "Jefry Acmal Dzikhrullah",
         "experience_list": experiences,
         "title_query": title_query,
+        "is_editor": is_editor,
         "is_editor": is_editor,
     }
     return render(request, "experience.html", context)
 
 def show_ctf_blog(request):
     title_query = request.GET.get("title", "").strip()
+    writeups = CTFWriteup.objects.all()
+
+    if title_query:
+        writeups = writeups.filter(title__icontains=title_query)
 
     context = {
         "name": "Jefry Acmal Dzikhrullah",
         "title_query": title_query,
         "form": CTFWriteupBlog(),
     }
+
     return render(request, "ctf_blog.html", context)
 
 def get_experiences_json(request):
@@ -78,6 +89,7 @@ def get_experiences_json(request):
     if title_query:
         experiences = experiences.filter(title__icontains=title_query)
 
+    experiences_json = serializers.serialize("json", experiences, use_natural_foreign_keys=True)
     experiences_json = serializers.serialize("json", experiences, use_natural_foreign_keys=True)
     return HttpResponse(experiences_json, content_type="application/json")
 
@@ -103,6 +115,9 @@ def create_experience(request):
 
 @login_required(login_url="/login/")
 def update_experience(request, experience_id):
+    is_editor = request.user.groups.filter(name="Editor").exists()
+
+    if not request.user.is_superuser and not is_editor:
     is_editor = request.user.groups.filter(name="Editor").exists()
 
     if not request.user.is_superuser and not is_editor:
@@ -267,8 +282,15 @@ def toggle_star(request, writeup_id):
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
 
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
     writeup = get_object_or_404(CTFWriteup, pk=writeup_id)
 
+    if writeup.starred_by.filter(pk=request.user.pk).exists():
+        writeup.starred_by.remove(request.user)
+    else:
+        writeup.starred_by.add(request.user)
     if writeup.starred_by.filter(pk=request.user.pk).exists():
         writeup.starred_by.remove(request.user)
     else:
