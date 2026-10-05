@@ -21,6 +21,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotAllowed
 from django.http import JsonResponse
 
+from django.views.decorators.http import require_POST
+
 
 def show_main(request):
     last_login = request.COOKIES.get('last_login', 'Belum ada sesi login / Cookie tidak ditemukan')
@@ -61,17 +63,12 @@ def show_experience(request):
 
 def show_ctf_blog(request):
     title_query = request.GET.get("title", "").strip()
-    writeups = CTFWriteup.objects.all()
-
-    if title_query:
-        writeups = writeups.filter(title__icontains=title_query)
 
     context = {
         "name": "Jefry Acmal Dzikhrullah",
-        "writeups": writeups,
         "title_query": title_query,
+        "form": CTFWriteupBlog(),
     }
-
     return render(request, "ctf_blog.html", context)
 
 def get_experiences_json(request):
@@ -158,19 +155,61 @@ def create_writeup(request):
     }
     return render(request, "writeup_form.html", context)
 
+@require_POST
+def create_writeup_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan write-up."},
+            status=403,
+        )
+
+    form = CTFWriteupBlog(request.POST)
+
+    if form.is_valid():
+        writeup = form.save()
+        return JsonResponse(
+            {
+                "message": "Write-up berhasil ditambahkan.",
+                "pk": str(writeup.id),
+            },
+            status=201,
+        )
+
+    return JsonResponse(
+        {"errors": form.errors.get_json_data()},
+        status=400,
+    )
+
 def get_writeups_json(request):
     title_query = request.GET.get("title", "").strip()
-    writeups = CTFWriteup.objects.all()
+    writeups = CTFWriteup.objects.prefetch_related("starred_by").all()
 
     if title_query:
         writeups = writeups.filter(title__icontains=title_query)
 
-    data = list(writeups.values(
-        "id",
-        "title",
-        "description",
-        "writeup_url",
-    ))
+    data = []
+
+    for writeup in writeups:
+        starred_users = writeup.starred_by.all()
+        is_starred = (
+            starred_users.filter(pk=request.user.pk).exists()
+            if request.user.is_authenticated
+            else False
+        )
+
+        data.append({
+            "pk": str(writeup.id),
+            "fields": {
+                "title": writeup.title,
+                "description": writeup.description,
+                "writeup_url": writeup.writeup_url,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": ", ".join(
+                    user.username for user in starred_users
+                ),
+            },
+        })
 
     return JsonResponse(data, safe=False)
 

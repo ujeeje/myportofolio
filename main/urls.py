@@ -15,6 +15,7 @@ from main.views import (
     login_user,
     logout_user,
     toggle_star,
+    create_writeup_ajax,
 )
 
 app_name = "main"
@@ -24,6 +25,7 @@ urlpatterns = [
     path("experience/", show_experience, name="show_experience"),
     path("ctf/", show_ctf_blog, name="show_ctf_blog"),
     path("ctf/add/", create_writeup, name="create_writeup"),
+    path("ctf/add-ajax/", create_writeup_ajax, name="create_writeup_ajax"),
     path("api/ctf/", get_writeups_json, name="get_writeups_json"),
     path("ctf/<uuid:writeup_id>/delete/", delete_writeup, name="delete_writeup"),
     path("experience/add/", create_experience, name="create_experience"),

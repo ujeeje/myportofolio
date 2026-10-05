@@ -4,6 +4,9 @@ from django.utils import timezone
 from main.models import Experience
 from main.models import CTFWriteup
 
+from django.core.exceptions import ValidationError
+from django.utils.html import strip_tags
+
 class ExperienceForm(ModelForm):
     status = ChoiceField(
         choices=[
@@ -97,3 +100,17 @@ class CTFWriteupBlog(ModelForm):
                 }
             ),
         }
+
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+
+        if not title:
+            raise ValidationError(
+                "Judul write-up tidak boleh hanya berisi tag HTML."
+            )
+
+        return title
+
+    def clean_description(self):
+        description = self.cleaned_data.get("description") or ""
+        return strip_tags(description).strip()

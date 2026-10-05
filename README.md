@@ -60,9 +60,31 @@ https://chatgpt.com/s/cx_6ab155328e68819194a9d0aa63d669bb
 - Otorisasi role editor yang bisa mengupdate data di section experience
 
 ### Riwayat Penggunaan GenAI
-Pada tugas 4 ini saya menggunakan AI memeriksa otorisasi editor apakah sudah berjalan dengan benar, meminta penjelasan lebih lanjut pada aksi penambahan relasi ManyToManyField ke model User, serta memeriksa apakah perubahan yang dilakukan sudah memenuhi ketentuan dan website bisa berfungsi sebagaimana mestinya pada untuk semua fitur. Saya menyoroti AI masih belum bisa melakukan debugging web dengan baik terlebih direktori dan file yang diperlukan pada projek web portofolio ini yang semakin kompleks. Saya tetap melakukan debugging manual dengan juga berkonsultasi pada AI untuk menemukan solusinya.
+Pada tugas 4 ini saya menggunakan AI untuk memeriksa otorisasi editor apakah sudah berjalan dengan benar, meminta penjelasan lebih lanjut pada aksi penambahan relasi ManyToManyField ke model User, serta memeriksa apakah perubahan yang dilakukan sudah memenuhi ketentuan dan website bisa berfungsi sebagaimana mestinya pada untuk semua fitur. Saya menyoroti AI masih belum bisa melakukan debugging web dengan baik terlebih direktori dan file yang diperlukan pada projek web portofolio ini yang semakin kompleks. Saya tetap melakukan debugging manual dengan juga berkonsultasi pada AI untuk menemukan solusinya.
 
 - https://chatgpt.com/s/cx_6aba872ac97c81919073e0d477152fc1
+
+## Tugas 5
+
+### Perubahan Mingguan
+- Mengubah alur pemuatan data daftar writeup CTF menjadi asinkron menggunakan AJAX untuk mengambil data dari endpoint JSON tanpa reload halaman.
+- Menambahkan handling User Interdace untuk kondisi loading, data kosong, dan error saat memuat data dari server.
+- Menerapkan fitur pencarian writeup via AJAX dengan teknik debouncing
+- Mengimplementasikan pengiriman data form dengan AJAX POST
+- Menambahkan notifikasi toast untuk memberikan feedback (status berhasil, gagal, atau pesan error validasi) kepada pengguna.
+- Menerapkan escaping teks pada JavaScript dan sanitasi input menggunakan strip_tags pada level ModelForm di sisi server.
+
+### Pertanyaan Reflektif
+1. Pada fitur pencarian, setiap karakter yang diketik oleh pengguna dapat memicu pengiriman permintaan ke server secara beruntun. Untuk mengelola hal tersebut, digunakan teknik debouncing, yaitu teknik untuk menunda pengeksekusian sebuah fungsi hingga suatu jeda waktu berlalu tanpa adanya input baru. Teknik ini diterapkan pada AJAX karena membuat pencarian lebih efisien dengan cara memastikan permintaan hanya dikirim ke server setelah pengguna benar-benar berhenti mengetik sejenak, sehingga mencegah terjadinya pengiriman permintaan data berulang-ulang dari setiap huruf yang diketik.
+
+2. Saat memanggil data menggunakan fungsi `fetch()`, fungsi tersebut tidak langsung menghasilkan data melainkan mengembalikan sebuah Promise. Fungsi utama dari penggunaan keyword await adalah untuk memerintahkan program agar "menunggu" Promise tersebut selesai diproses secara penuh sebelum melanjutkan eksekusi ke baris kode berikutnya. Jika await tidak digunakan, Promise tersebut akan dibiarkan tetap berjalan di belakang layar sementara baris kode di bawahnya akan langsung dieksekusi tanpa menunggu hasil pengambilan data tersebut tersedia
+
+3. Serangan XSS (Cross-Site Scripting) adalah sebuah jenis serangan di mana pihak penyerang berhasil menyisipkan kode JavaScript berbahaya ke dalam suatu halaman web, dan kemudian tanpa disengaja ikut dijalankan pada browser pengguna lain. Data yang ditampilkan via JavaScript jauh lebih rentan terhadap XSS karena data sering kali disisipkan secara langsung ke halaman web tanpa perlindungan seperti escaping. Perlindungan escaping merupakan proses pengubahan karakter-karakter khusus HTML (seperti tanda < dan >) menjadi teks biasa (seperti &lt; dan &gt;). Tanpa adanya proses ini, browser akan menafsirkan karakter tersebut sebagai tag HTML atau kode sungguhan yang harus dieksekusi. Hal ini berbeda dengan template Django yang sudah memiliki mekanisme auto-escaping bawaan untuk mengubah karakter khusus HTML menjadi teks biasa, sehingga tag HTML yang berbahaya tersebut tidak akan dieksekusi oleh browser sebagai kode.
+
+### Riwayat Penggunaan GenAI
+Pada tugas 5 ini saya menggunakan AI untuk memandu saya dalam mengimplementasikan AJAX, Debouncing, Toast Notification, dan XSS Protection. Saya juga meminta penjelasan lebih lanjut terkait tahap-tahap yang perlu saya lakukan dan efeknya pada projek saya ini. Selain itu, saya juga menggunakan AI untuk memeriksa apakah perubahan yang dilakukan sudah memenuhi ketentuan dan website bisa berfungsi sebagaimana mestinya pada untuk semua fitur. Saya menyoroti AI masih belum bisa melakukan debugging web dengan baik terlebih direktori dan file yang diperlukan pada projek web portofolio ini yang semakin kompleks. Saya tetap melakukan debugging manual dengan juga berkonsultasi pada AI untuk menemukan solusinya.
+
+- https://chatgpt.com/s/cx_6ac3bad648d08191a01cc1a26058cd99 
 
 ## Panduan Setup
 
