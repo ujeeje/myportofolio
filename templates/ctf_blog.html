@@ -1,4 +1,7 @@
+
 {% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
 <main>
     <section class="ctf-section" id="ctf-blog">
@@ -15,10 +18,12 @@
                 </button>
             {% endif %}
 
+            <!-- Search Form -->
             <form id="writeup-search-form"
                   method="get"
                   action="{% url 'main:show_ctf_blog' %}"
                   class="writeup-search">
+
                 <input type="search"
                        id="search-input"
                        name="title"
@@ -26,26 +31,43 @@
                        placeholder="Cari berdasarkan nama write-up"
                        class="writeup-search__input"
                        aria-label="Cari berdasarkan nama write-up">
-                <button type="submit" class="button">Cari</button>
+
+                <button type="submit" class="button">
+                    Cari
+                </button>
             </form>
 
-            <div id="loading" class="empty-state hide" role="status">
+            <!-- Loading State -->
+            <div id="loading"
+                 class="empty-state hide"
+                 role="status">
                 <p>Memuat write-up...</p>
             </div>
 
-            <div id="error" class="empty-state hide" role="alert">
+            <!-- Error State -->
+            <div id="error"
+                 class="empty-state hide"
+                 role="alert">
                 <p>Gagal memuat data write-up. Silakan coba lagi.</p>
             </div>
 
+            <!-- Empty State -->
             <div id="empty" class="empty-state hide">
                 <p>Belum ada CTF write-up yang ditambahkan atau ditemukan.</p>
             </div>
 
+            <!-- Writeups Container -->
             <div id="grid" class="ctf-grid hide"></div>
         </div>
     </section>
 </main>
 
+<!-- CSRF Token -->
+<form id="csrf-form" hidden>
+    {% csrf_token %}
+</form>
+
+<!-- Add Writeup Modal -->
 {% if user.is_superuser %}
     <div id="add-writeup-modal"
          class="writeup-form-modal"
@@ -58,9 +80,11 @@
                 class="writeup-form-modal__backdrop"
                 popovertarget="add-writeup-modal"
                 popovertargetaction="hide"
-                aria-label="Tutup form tambah write-up"></button>
+                aria-label="Tutup form tambah write-up">
+        </button>
 
         <div class="writeup-form-modal__content">
+
             <button type="button"
                     class="writeup-form-modal__close"
                     popovertarget="add-writeup-modal"
@@ -69,16 +93,20 @@
                 ×
             </button>
 
-            <h2 id="add-writeup-modal-title">Tambah Write-Up Baru</h2>
+            <h2 id="add-writeup-modal-title">
+                Tambah Write-Up Baru
+            </h2>
 
             <form id="writeup-form"
                   method="post"
-                  action="{% url 'main:create_writeup_ajax' %}"
+                  action="{% url 'api:ctfwriteup-list' %}"
                   class="writeup-form">
+
                 {% csrf_token %}
 
                 {% for field in form %}
                     <div class="form-group">
+
                         <label for="{{ field.id_for_label }}">
                             {{ field.label }}
                         </label>
@@ -86,12 +114,16 @@
                         {{ field }}
 
                         {% for error in field.errors %}
-                            <p class="form-error">{{ error }}</p>
+                            <p class="form-error">
+                                {{ error }}
+                            </p>
                         {% endfor %}
+
                     </div>
                 {% endfor %}
 
                 <div class="writeup-form-modal__actions">
+
                     <button type="button"
                             class="button button-secondary"
                             popovertarget="add-writeup-modal"
@@ -102,252 +134,33 @@
                     <button type="submit" class="button">
                         Tambah Write-Up
                     </button>
+
                 </div>
             </form>
         </div>
     </div>
 {% endif %}
 
+<!-- API Configuration -->
 <script>
-    const BASE_WRITEUPS_ENDPOINT = "{% url 'main:get_writeups_json' %}";
-    const CREATE_WRITEUP_ENDPOINT = "{% url 'main:create_writeup_ajax' %}";
-    const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
+    const BASE_WRITEUPS_ENDPOINT =
+        "{% url 'api:ctfwriteup-list' %}";
 
-    const SEARCH_DEBOUNCE_DELAY = 300;
-    let searchDebounceTimer;
-    let writeupsAbortController;
+    const CREATE_WRITEUP_ENDPOINT =
+        "{% url 'api:ctfwriteup-list' %}";
 
-    const loadingState = document.getElementById("loading");
-    const errorState = document.getElementById("error");
-    const emptyState = document.getElementById("empty");
-    const gridContainer = document.getElementById("grid");
-    const searchForm = document.getElementById("writeup-search-form");
-    const searchInput = document.getElementById("search-input");
-    const writeupForm = document.getElementById("writeup-form");
+    const TOGGLE_STAR_URL =
+        "{% url 'api:ctfwriteup-star' '00000000-0000-0000-0000-000000000000' %}";
 
-    function displayPageSection({
-        showLoading = false,
-        showError = false,
-        showEmpty = false,
-        showGrid = false,
-    }) {
-        loadingState.classList.toggle("hide", !showLoading);
-        errorState.classList.toggle("hide", !showError);
-        emptyState.classList.toggle("hide", !showEmpty);
-        gridContainer.classList.toggle("hide", !showGrid);
-    }
+    const DELETE_WRITEUP_URL =
+        "{% url 'api:ctfwriteup-detail' '00000000-0000-0000-0000-000000000000' %}";
 
-    // Escape nilai teks dari JSON sebelum disisipkan sebagai HTML.
-    function escapeHtml(value) {
-        return String(value ?? "")
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#39;");
-    }
-
-    function buildWriteupCardElement(item) {
-        const writeup = item.fields;
-        const writeupId = item.pk;
-
-        const articleElement = document.createElement("article");
-        articleElement.className = "ctf-card";
-
-        const writeupUrlHtml = writeup.writeup_url
-            ? `<a href="${escapeHtml(writeup.writeup_url)}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="btn-read-pdf">Open</a>`
-            : `<p class="writeup-link-missing">Link write-up belum tersedia.</p>`;
-
-        const placeholderId = "00000000-0000-0000-0000-000000000000";
-
-        const deleteUrl = "{% url 'main:delete_writeup' '00000000-0000-0000-0000-000000000000' %}"
-            .replace(placeholderId, encodeURIComponent(writeupId));
-
-        const starUrl = "{% url 'main:toggle_star' '00000000-0000-0000-0000-000000000000' %}"
-            .replace(placeholderId, encodeURIComponent(writeupId));
-
-        const deleteHtml = IS_SUPERUSER
-            ? `<form method="post" action="${deleteUrl}">
-                   {% csrf_token %}
-                   <button type="submit"
-                           class="button button-secondary"
-                           onclick="return confirm('Yakin ingin menghapus write-up ini?');">
-                       Delete
-                   </button>
-               </form>`
-            : "";
-
-        const isStarredClass = writeup.is_starred ? " is-starred" : "";
-        const starText = writeup.is_starred ? "Unstar" : "Star";
-        const starTitle = writeup.star_count > 0
-            ? `Diberi star oleh ${escapeHtml(writeup.starred_by_names)}`
-            : "Jadilah yang pertama memberi star";
-
-        articleElement.innerHTML = `
-            <h2>${escapeHtml(writeup.title)}</h2>
-
-            <div class="ctf-content">
-                ${writeup.description
-                    ? `<p>${escapeHtml(writeup.description)}</p>`
-                    : ""}
-
-                <div class="ctf-actions">
-                    ${writeupUrlHtml}
-
-                    <form method="post" action="${starUrl}" class="star-form">
-                        {% csrf_token %}
-                        <button type="submit"
-                                class="button button-star${isStarredClass}"
-                                title="${starTitle}">
-                            <span aria-hidden="true">★</span>
-                            ${writeup.is_starred ? "Unstar" : "Star"}
-                            <span class="star-count">
-                                ${Number(writeup.star_count) || 0}
-                            </span>
-                        </button>
-                    </form>
-
-                    ${deleteHtml}
-                </div>
-            </div>
-        `;
-
-        return articleElement;
-    }
-
-    async function fetchWriteups(searchQuery = "") {
-        if (writeupsAbortController) {
-            writeupsAbortController.abort();
-        }
-
-        writeupsAbortController = new AbortController();
-
-        try {
-            displayPageSection({ showLoading: true });
-            gridContainer.innerHTML = "";
-
-            const url = searchQuery
-                ? `${BASE_WRITEUPS_ENDPOINT}?title=${encodeURIComponent(searchQuery)}`
-                : BASE_WRITEUPS_ENDPOINT;
-
-            const response = await fetch(url, {
-                headers: { Accept: "application/json" },
-                signal: writeupsAbortController.signal,
-            });
-
-            if (!response.ok) {
-                throw new Error(`Gagal memuat data (status ${response.status})`);
-            }
-
-            const writeupData = await response.json();
-
-            if (!Array.isArray(writeupData)) {
-                throw new Error("Format data dari server tidak sesuai.");
-            }
-
-            if (writeupData.length === 0) {
-                displayPageSection({ showEmpty: true });
-                return;
-            }
-
-            writeupData.forEach((item) => {
-                gridContainer.appendChild(buildWriteupCardElement(item));
-            });
-
-            displayPageSection({ showGrid: true });
-        } catch (error) {
-            if (error.name === "AbortError") {
-                return;
-            }
-
-            console.error("Error loading write-ups:", error);
-            displayPageSection({ showError: true });
-        }
-    }
-
-    function searchWriteups() {
-        fetchWriteups(searchInput.value.trim());
-    }
-
-    searchInput.addEventListener("input", () => {
-        clearTimeout(searchDebounceTimer);
-
-        searchDebounceTimer = setTimeout(() => {
-            searchWriteups();
-        }, SEARCH_DEBOUNCE_DELAY);
-    });
-
-    searchForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        clearTimeout(searchDebounceTimer);
-        searchWriteups();
-    });
-
-    if (writeupForm) {
-        writeupForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            const submitButton = writeupForm.querySelector('button[type="submit"]');
-            submitButton.disabled = true;
-
-            try {
-                const response = await fetch(CREATE_WRITEUP_ENDPOINT, {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json",
-                    },
-                    body: new FormData(writeupForm),
-                });
-
-                const result = await response.json().catch(() => ({}));
-
-                if (response.ok) {
-                    writeupForm.reset();
-                    document
-                        .getElementById("add-writeup-modal")
-                        .hidePopover();
-
-                    showToast(
-                        "Berhasil",
-                        "Write-up baru berhasil ditambahkan!",
-                        "success"
-                    );
-
-                    fetchWriteups(searchInput.value.trim());
-                    return;
-                }
-
-                const errorMessages = result.errors
-                    ? Object.values(result.errors)
-                        .flat()
-                        .map((error) => error.message)
-                    : [
-                        result.message
-                        || `Terjadi kesalahan (status ${response.status}).`,
-                    ];
-
-                showToast(
-                    "Gagal menambahkan write-up",
-                    errorMessages.join(" "),
-                    "error"
-                );
-            } catch (error) {
-                console.error("Error adding write-up:", error);
-
-                showToast(
-                    "Gagal menambahkan write-up",
-                    "Tidak dapat terhubung ke server. Silakan coba lagi.",
-                    "error"
-                );
-            } finally {
-                submitButton.disabled = false;
-            }
-        });
-    }
-
-    fetchWriteups(searchInput.value.trim());
+    const IS_SUPERUSER =
+        "{{ user.is_superuser|yesno:'true,false' }}" === "true";
 </script>
+
+<!-- JavaScript Files -->
+<script src="{% static 'js/toast.js' %}"></script>
+<script src="{% static 'js/ctfwriteups.js' %}"></script>
+
 {% endblock content %}
