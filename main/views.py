@@ -74,10 +74,16 @@ def show_ctf_blog(request):
     if title_query:
         writeups = writeups.filter(title__icontains=title_query)
 
+    is_editor = (
+        request.user.is_authenticated
+        and request.user.groups.filter(name="Editor").exists()
+    )
+
     context = {
         "name": "Jefry Acmal Dzikhrullah",
         "title_query": title_query,
         "form": CTFWriteupBlog(),
+        "can_edit": request.user.is_superuser or is_editor,
     }
 
     return render(request, "ctf_blog.html", context)

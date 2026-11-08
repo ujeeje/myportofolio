@@ -86,6 +86,34 @@ Pada tugas 5 ini saya menggunakan AI untuk memandu saya dalam mengimplementasika
 
 - https://chatgpt.com/s/cx_6ac3bad648d08191a01cc1a26058cd99 
 
+## Tugas 6
+
+### Perubahan Mingguan
+- Menambahkan Django REST Framework ke dependensi dan settings, serta mendaftarkan rute API di bawah prefix api/v1/.
+- Membuat CTFWriteupSerializer dengan field read-only star_count, is_starred, dan starred_by_names, serta sanitasi input menggunakan strip_tags untuk mencegah XSS.
+- Membuat permission class dengan 4 peran: Pengunjung (baca), Pengguna Terdaftar (baca dan star), Editor (baca, star, PUT/PATCH), dan Superuser (akses penuh CRUD).
+- Mengimplementasikan API view berbasis fungsi untuk list (dengan pencarian ?title=), detail, dan toggle star, dengan status kode HTTP yang sesuai.
+- Mengubah halaman write-up menjadi asinkron dengan fetch() untuk fitur Read, Search (debouncing), Create, Star, Edit (PATCH), dan Delete tanpa reload halaman.
+- Menyertakan header X-CSRFToken pada request mutasi, menambahkan notifikasi toast untuk sukses dan error (400/403), serta menerapkan escaping teks pada JavaScript.
+- Menulis unit test dengan APITestCase untuk akses tiap peran, validasi dan sanitasi input, toggle star, dan proteksi CSRF.
+
+
+### Pertanyaan Reflektif
+1. Menurut saya, REST (Representational State Transfer) bisa dikatakan seperangkat aturan untuk merancang API di web. Aturan ini mengatur bagaimana URL disusun, method HTTP dipakai, dan status code dikembalikan. API yang mengikuti aturan ini disebut RESTful. JSON hanya menentukan format data yang dikirim, sedangkan REST menentukan struktur komunikasinya. Karena itu, API yang mengembalikan JSON belum tentu RESTful. Misalnya, ada API yang menerima semua tindakan lewat satu URL dengan POST, lalu membalas dengan JSON. API seperti itu tidak mengikuti aturan REST. Ada tiga prinsip REST yang kita terapkan. 
+    1) Setiap data diperlakukan sebagai resource dengan URL sendiri. Contohnya `/api/v1/ctf-writeups/` untuk kumpulan write-up dan `/api/v1/ctf-writeups/<uuid>/` untuk satu write-up. 
+    2) Tindakan ditentukan oleh HTTP method, bukan oleh URL. GET untuk membaca, POST untuk membuat, PUT atau PATCH untuk mengubah, dan DELETE untuk menghapus. Dengan begitu, kita tidak perlu membuat URL seperti `/add-ajax/` atau `/delete/`. 
+    3) Server mengembalikan status code yang sesuai dengan hasilnya, misalnya 201 untuk data yang berhasil dibuat dan 404 untuk data yang tidak ditemukan. 
+Selanjutnya, PUT dan PATCH sama-sama dipakai untuk mengubah data, tetapi cakupannya berbeda. PUT mengganti seluruh resource, sehingga semua field harus dikirim ulang. PATCH hanya mengubah field yang dikirim. Oleh karena itu, PUT cocok untuk form edit yang menampilkan semua field. Sebaliknya, PATCH cocok untuk perubahan kecil, misalnya modal edit yang hanya mengganti judul write-up.
+
+2. Serializer adalah komponen di Django REST Framework, yaitu toolkit di atas Django untuk membangun web API. Tugas serializer adalah menerjemahkan data antara objek model Django dan format yang dipakai klien, yaitu JSON. Pada serialization, misalnya saat GET, serializer mengubah objek model menjadi data Python yang kemudian dirender menjadi JSON. Pada deserialization, misalnya saat POST atau PATCH, serializer membaca JSON dari request dan mengubahnya menjadi data Python. Data itu divalidasi dengan `is_valid()`, lalu disimpan ke database dengan `save()`. Pada Tutorial 05, semua itu dikerjakan secara manual. `get_projects_json` membuat dictionary untuk setiap objek lewat perulangan. Lalu `create_project_ajax` memvalidasi input dengan form dan menentukan status HTTP sendiri. Pola ini harus ditulis ulang setiap ada model baru.  Serializer menyederhanakannya dengan cukup ditulis sekali di satu class. 
+
+3. Autentikasi memeriksa “siapa pengirim request ini?”. Pada tahap ini, `SessionAuthentication` membaca session dan mengisi request.user. Jika pengguna belum login, request.user berisi AnonymousUser. Setelah identitas diketahui, otorisasi menjawab pertanyaan “apakah pengirim ini boleh melakukan tindakan tersebut?”. Tahap ini dikerjakan oleh permission class. Contohnya,  `IsPortfolioOwnerOrEditorOrReadOnly` hanya mengizinkan pengunjung membaca. Editor boleh membaca serta melakukan PUT dan PATCH. Superuser boleh melakukan semua operasi. Pemeriksaan ini harus dilakukan di server karena menyembunyikan tombol di template hanya mengubah tampilan, sedangkan otorisasinya tidak berubah. Siapa pun tetap bisa mengirim request langsung ke endpoint lewat fetch atau curl tanpa menekan tombol apa pun. 
+
+4. `SessionAuthentication` mengenali pengguna lewat cookie session yang disimpan browser setelah login. Browser otomatis menyertakan cookie ini pada setiap request ke domain yang sama, termasuk bisa dari request yang dikirim diam-diam dari website lain. Akibatnya, website seorang attacker bisa membuat request DELETE atas nama kita yang sedang login. Serangan ini disebut CSRF. Karena itu, request yang mengubah data harus membawa token CSRF di header X-CSRFToken. Website penyerang tidak bisa membaca token tersebut, sehingga request palsunya direject dengan 403. Test yang memakai `force_authenticate` langsung menetapkan pengguna tanpa login dan session, sehingga pemeriksaan CSRF terlewati. Oleh karena itu, test harus memakai `APIClient(enforce_csrf_checks=True)` dan `.login()` agar pemeriksaan CSRF berjalan seperti di browser.
+
+### Riwayat Penggunaan GenAI
+Pada tugas 6 ini saya menggunakan AI untuk memeriksa checklist yang ada pada ketentuan tugas, sehingga saya bisa memastikan tidak ada bagian yang terlewat. Saya juga menggunakan AI untuk membantu mengimplementasikan fitur menyediakan cara mengubah data via PUT atau PATCH dari halaman, yaitu modal edit dan tombol Edit yang memanggil endpoint API. Selain itu, saya menggunakan AI untuk memeriksa apakah perubahan yang dilakukan sudah memenuhi ketentuan dan website bisa berfungsi sebagaimana mestinya untuk semua fitur. Saya menyoroti bahwa AI masih belum bisa melakukan debugging web dengan baik, terlebih karena direktori dan file pada projek web portofolio ini semakin kompleks. Saya tetap melakukan debugging manual sambil berkonsultasi dengan AI untuk menemukan solusinya.
+
 ## Panduan Setup
 
 1. Masuk ke direktori project.
