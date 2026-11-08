@@ -141,6 +141,82 @@
     </div>
 {% endif %}
 
+<!-- Edit Writeup Modal -->
+{% if can_edit %}
+    <div id="edit-writeup-modal"
+         class="writeup-form-modal"
+         popover="auto"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="edit-writeup-modal-title">
+
+        <button type="button"
+                class="writeup-form-modal__backdrop"
+                popovertarget="edit-writeup-modal"
+                popovertargetaction="hide"
+                aria-label="Tutup form edit write-up">
+        </button>
+
+        <div class="writeup-form-modal__content">
+
+            <button type="button"
+                    class="writeup-form-modal__close"
+                    popovertarget="edit-writeup-modal"
+                    popovertargetaction="hide"
+                    aria-label="Tutup form edit write-up">
+                ×
+            </button>
+
+            <h2 id="edit-writeup-modal-title">
+                Edit Write-Up
+            </h2>
+
+            <form id="edit-writeup-form" class="writeup-form">
+                <input type="hidden" id="edit-writeup-id" name="id">
+
+                <div class="form-group">
+                    <label for="edit-title">Nama Event</label>
+                    <input type="text"
+                           id="edit-title"
+                           name="title"
+                           required
+                           maxlength="255"
+                           placeholder="Apa event yang kamu ikuti?">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-description">Deskripsi Write-Up</label>
+                    <textarea id="edit-description"
+                              name="description"
+                              rows="3"
+                              placeholder="Ceritakan apa yang kamu lakukan"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-writeup-url">URL Write-up</label>
+                    <input type="url"
+                           id="edit-writeup-url"
+                           name="writeup_url"
+                           placeholder="https://drive.google.com/.../">
+                </div>
+
+                <div class="writeup-form-modal__actions">
+                    <button type="button"
+                            class="button button-secondary"
+                            popovertarget="edit-writeup-modal"
+                            popovertargetaction="hide">
+                        Batal
+                    </button>
+
+                    <button type="submit" class="button">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endif %}
+
 <!-- API Configuration -->
 <script>
     const BASE_WRITEUPS_ENDPOINT =
@@ -155,8 +231,14 @@
     const DELETE_WRITEUP_URL =
         "{% url 'api:ctfwriteup-detail' '00000000-0000-0000-0000-000000000000' %}";
 
+    const DETAIL_WRITEUP_URL =
+        "{% url 'api:ctfwriteup-detail' '00000000-0000-0000-0000-000000000000' %}";
+
     const IS_SUPERUSER =
         "{{ user.is_superuser|yesno:'true,false' }}" === "true";
+
+    const CAN_EDIT =
+        "{{ can_edit|yesno:'true,false' }}" === "true";
 </script>
 
 <!-- JavaScript Files -->
