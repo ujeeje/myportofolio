@@ -30,7 +30,12 @@ SECRET_KEY = 'django-insecure-siqzv7_mqybe5nnp%5x6i45_n4o*7p+a$5juye3tk7!zi+%1nv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "jefry-acmal-myportofolio.pws.cs.ui.ac.id"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "10.0.2.2",
+    "jefry-acmal-myportofolio.pws.cs.ui.ac.id",
+]
 
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 
@@ -45,13 +50,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',
-    'rest_framework'
+    'corsheaders',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -131,6 +139,27 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = ["https://jefry-acmal-myportofolio.pws.cs.ui.ac.id"]
+
+# Flutter's mobile client uses DRF tokens, while Django's web pages retain
+# session authentication.  Token authentication is first so missing or invalid
+# mobile credentials receive a 401 response instead of a CSRF-related 403.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
+
+# Flutter Web is served from a different origin in local development.  Native
+# Android applications do not use CORS, but allowing it locally keeps both
+# targets usable.  Production origins must be provided explicitly.
+CORS_ALLOW_ALL_ORIGINS = not PRODUCTION
+if PRODUCTION:
+    CORS_ALLOWED_ORIGINS = [
+        origin.strip()
+        for origin in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+        if origin.strip()
+    ]
 
 
 # Internationalization

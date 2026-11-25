@@ -2,7 +2,23 @@
 from django.utils.html import strip_tags
 from rest_framework import serializers
 
-from main.models import CTFWriteup
+from main.models import CTFWriteup, Project
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    """Serializer contract consumed by the Flutter `Project` model."""
+
+    class Meta:
+        model = Project
+        fields = [
+            "id",
+            "title",
+            "description",
+            "tech_stack",
+            "project_url",
+            "project_image_url",
+        ]
+        read_only_fields = ["id"]
 
 
 class CTFWriteupSerializer(serializers.ModelSerializer):

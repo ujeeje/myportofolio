@@ -3,9 +3,64 @@ import uuid
 from django.contrib.auth.models import Group, User
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
-from main.models import CTFWriteup
+from main.models import CTFWriteup, Project
+
+
+class ProjectAPITest(APITestCase):
+    def setUp(self):
+        self.owner = User.objects.create_superuser(
+            username="project-owner",
+            password="test-password",
+            email="project-owner@example.com",
+        )
+        self.visitor = User.objects.create_user(
+            username="project-visitor",
+            password="test-password",
+        )
+        self.project = Project.objects.create(
+            title="Portfolio Mobile",
+            description="Flutter client for the portfolio API.",
+            tech_stack="Flutter, Django REST Framework",
+            project_url="https://example.com/portfolio-mobile",
+        )
+        self.list_url = reverse("api:project-list")
+        self.payload = {
+            "title": "New Project",
+            "description": "Created from the mobile application.",
+            "tech_stack": "Flutter, Django",
+            "project_url": "https://example.com/new-project",
+            "project_image_url": "",
+        }
+
+    def test_public_list_uses_flutter_json_schema(self):
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]["id"], str(self.project.id))
+        self.assertEqual(
+            response.data[0]["tech_stack"],
+            "Flutter, Django REST Framework",
+        )
+        self.assertEqual(response.data[0]["project_image_url"], "")
+
+    def test_only_admin_token_can_create_project(self):
+        response = self.client.post(self.list_url, self.payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        visitor_token = Token.objects.create(user=self.visitor)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {visitor_token.key}")
+        response = self.client.post(self.list_url, self.payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        owner_token = Token.objects.create(user=self.owner)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {owner_token.key}")
+        response = self.client.post(self.list_url, self.payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Project.objects.filter(pk=response.data["id"]).exists())
 
 
 class CTFWriteupAPITest(APITestCase):

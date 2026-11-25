@@ -1,20 +1,44 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from main.models import CTFWriteup
+from main.models import CTFWriteup, Project
 from main.permissions import IsPortfolioOwnerOrReadOnly
-from main.serializers import CTFWriteupSerializer
+from main.serializers import CTFWriteupSerializer, ProjectSerializer
 from main.permissions import IsPortfolioOwnerOrEditorOrReadOnly
 
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def api_logout(request):
+    """Revoke the token used by the current authenticated client."""
+    if request.auth is not None:
+        request.auth.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 @api_view(["GET", "HEAD", "POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsPortfolioOwnerOrReadOnly])
+def project_list(request):
+    """List public portfolio projects or create one as the portfolio owner."""
+    if request.method in ("GET", "HEAD"):
+        projects = Project.objects.order_by("title", "id")
+        return Response(ProjectSerializer(projects, many=True).data)
+
+    serializer = ProjectSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["GET", "HEAD", "POST"])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def ctfwriteup_list(request):
     if request.method in ("GET", "HEAD"):
@@ -47,7 +71,7 @@ def ctfwriteup_list(request):
     )
 
 @api_view(["GET", "HEAD", "PUT", "PATCH", "DELETE"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def ctfwriteup_detail(request, writeup_id):
     writeup = get_object_or_404(
@@ -79,7 +103,7 @@ def ctfwriteup_detail(request, writeup_id):
     return Response(serializer.data)
 
 @api_view(["POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
 @permission_classes([IsAuthenticated])
 def ctfwriteup_star(request, writeup_id):
     writeup = get_object_or_404(CTFWriteup, pk=writeup_id)
