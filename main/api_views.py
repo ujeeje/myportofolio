@@ -7,9 +7,13 @@ from rest_framework.decorators import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from main.models import CTFWriteup, Project
+from main.models import CTFWriteup, Experience, Project
 from main.permissions import IsPortfolioOwnerOrReadOnly
-from main.serializers import CTFWriteupSerializer, ProjectSerializer
+from main.serializers import (
+    CTFWriteupSerializer,
+    ExperienceSerializer,
+    ProjectSerializer,
+)
 from main.permissions import IsPortfolioOwnerOrEditorOrReadOnly
 
 
@@ -32,6 +36,21 @@ def project_list(request):
         return Response(ProjectSerializer(projects, many=True).data)
 
     serializer = ProjectSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["GET", "HEAD", "POST"])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsPortfolioOwnerOrReadOnly])
+def experience_list(request):
+    """List public experiences or create one as the portfolio owner."""
+    if request.method in ("GET", "HEAD"):
+        experiences = Experience.objects.order_by("-started_at", "title")
+        return Response(ExperienceSerializer(experiences, many=True).data)
+
+    serializer = ExperienceSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -13,6 +13,7 @@ urlpatterns = [
     ),
     path("auth/logout/", api_views.api_logout, name="api_logout"),
     path("projects/", api_views.project_list, name="project-list"),
+    path("experiences/", api_views.experience_list, name="experience-list"),
     path(
         "ctf-writeups/",
         api_views.ctfwriteup_list,
